@@ -39,19 +39,24 @@ int startgame()
 
 int getNumberOfLiveNeighbors(int x, int y)
 {        
-   int neighbors = 0 ;            
-   for(int i=x-1 ; i<=x+1 ; i++)
-   {  
-       for(int j=y-1 ; j<=y+1 ; j++)
-	   {  
-           if(!(i==x && j==y)&&(x>=0) && (y>=0)&& x<M && y<N)
-		   {
-               if(grid[i][j]==1)
-			   {                   
+    int neighbors = 0 ;       
+    if(x<0||y<0)
+	{
+   	printf("somthing went wrong!"); 
+   	return -1;
+	}     
+    for(int i=x-1 ; i<=x+1 ; i++)
+    {  
+        for(int j=y-1 ; j<=y+1 ; j++)
+		{  
+            if(!(i==x && j==y)&&(x>=0) && (y>=0)&& x<M && y<N)
+		    {
+                if(grid[i][j]==1)
+			    {                   
                  neighbors ++ ;    		        
-              }	
-  	      }		
-       }	 
+            	}	
+  	    	}
+        }	 
     }	
     return neighbors;
 
@@ -61,20 +66,19 @@ int getNumberOfLiveNeighbors(int x, int y)
 int updateGrid()
 {
 
-   int neighbor[M][N];
-   neighbor[M][N] = 0;                                  
-   for(int x=0 ; x<M ; x++)
-   {
-       for(int y=0 ; y<N ; y++)
-	   {
-	   neighbor[x][y] = getNumberOfLiveNeighbors(x,y);   
-       }
-   } 
+    int neighbor[M][N];
+    neighbor[M][N] = 0;                                  
+    for(int x=0 ; x<M ; x++)
+    {
+        for(int y=0 ; y<N ; y++)
+		{
+	    neighbor[x][y] = getNumberOfLiveNeighbors(x,y);   
+        }
+    } 
     for(int x=0 ; x<M ; x++)
 	{
-       for(int y=0; y<N ; y++)
-	   {	
-		   
+        for(int y=0; y<N ; y++)
+	    {	 
 	    if(grid[x][y]==1)
 		{             
 		
@@ -87,8 +91,6 @@ int updateGrid()
 			{                       
 				grid[x][y]=1 ;            	
 			}
-	  
-
         }
 		else if(grid[x][y]==0)
 		{      
@@ -106,7 +108,7 @@ int updateGrid()
 
 
 
-void save()
+int save()
 {
 	FILE *fp;
 	fp=fopen("file.txt","w+");
@@ -119,8 +121,8 @@ void save()
 				fprintf(fp,"%d ",grid[x][y]);
             }
             fprintf(fp,"\n");
-        }	
-    
+        } 
+        return 0;
 } 
 
 
@@ -137,10 +139,9 @@ int readfile()
         	for (int y=0 ; y<N ; y++ ) 
 			{
 				fscanf(fp,"%d",&grid[x][y]);
-
             }
         }
-
+        return 0;
 }
 	 
 	 
