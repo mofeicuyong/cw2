@@ -27,10 +27,19 @@ int startgame()
       	}  
       	if(initialState==1)
       	{
+      		printf("Attention:row and col can not less than 10, if you choose less than 10 it will change into 11.\n");
       		printf("decide the row:");
 			scanf("%d",&M);
+			if(M<10)
+			{
+				M=11;
+			}
 			printf("decide the col:");
 			scanf("%d",&N);
+			if(N<10)
+			{
+				N=11;
+			}
 		}
        return 0;
 }
