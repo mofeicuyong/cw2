@@ -8,6 +8,19 @@ typedef struct
     Uint32 last_cursor_x;
     Uint32 last_cursor_y;
 } mouseState;
+typedef struct {
+    Uint8 kButtonDown;
+    Uint8 upButtonDown;
+    Uint8 downButtonDown;
+} buttons;
+uint8_t quit = FALSE;
+uint8_t paused = FALSE;
+buttons keys = { FALSE };
+int living_cells = 0;
+    
+Uint32 last_update_time = 0;
+Uint32 ticks_per_lifecycle = 1000;
+void update_button_states( buttons *bts, SDL_Event e, Uint8 isKeydown );
 mouseState mouse = { FALSE, (Uint16)-1, (Uint16)-1 };
 SDL_bool done = SDL_TRUE; 	
 SDL_Window* window = NULL;
@@ -57,7 +70,7 @@ int drawGrid(int windowHeight,int windowWidth,int M,int N)
 	return 0;
 }
 
-int checkEvents()
+int checkEvents(int M,int N)
 {
 	while (SDL_PollEvent(&event)) 
 	{
@@ -65,21 +78,68 @@ int checkEvents()
 		{
 			done = SDL_TRUE;
 		}
+		else if ( event.type == SDL_KEYDOWN || event.type == SDL_KEYUP )
+            {
+                Uint8 isKeydown = event.type == SDL_KEYDOWN;
+                update_button_states( &keys, event, isKeydown);
+                switch ( event.key.keysym.scancode )
+                {
+                case SDL_SCANCODE_SPACE:
+                    paused = isKeydown ^ paused;
+                    break;
+                case SDL_SCANCODE_Q:
+                    quit = TRUE;
+                    break;
+                }
+
+            }
+		if ( keys.kButtonDown )
+        {
+            for (int x=0 ; x<M ; x++) 
+	    	{
+        		for (int y=0 ; y<N ; y++ ) 
+				{
+                	grid[x][y] = 0 ;  
+           		}
+        	}
+            keys.kButtonDown = FALSE;
+        }
+		if ( keys.upButtonDown )
+        {
+            if ( ticks_per_lifecycle > 100 )
+            {
+                ticks_per_lifecycle -= 100;
+            }
+        }
+        if ( keys.downButtonDown )
+        {
+            if ( ticks_per_lifecycle < 10000 )
+            {
+                ticks_per_lifecycle += 100;
+            }
+        }
+		if ( !( ( SDL_GetTicks( ) - last_update_time ) < ticks_per_lifecycle ) && !paused )
+        {
+            living_cells = updateGrid();
+            last_update_time = SDL_GetTicks( );
+        }
 		
-                 else if ( event.type == SDL_MOUSEBUTTONUP )
+		
+		
+		
+            else if ( event.type == SDL_MOUSEBUTTONUP )
             {
                 mouse.leftButtonPressed = FALSE;
                 mouse.last_cursor_x = mouse.last_cursor_y = (Uint16)-1;
-            }
+            }      
             else if ( event.type == SDL_MOUSEBUTTONDOWN )
             {
                 mouse.leftButtonPressed = TRUE;
             }
             if ( mouse.leftButtonPressed )
-        {
+        	{
             int cursor_x, cursor_y;
             SDL_GetMouseState( &cursor_x, &cursor_y );
-            // change the cell state if the mouse points to a new cell
             if ( !( cursor_x /CSIZE == mouse.last_cursor_x / CSIZE && 
 			cursor_y /CSIZE == mouse.last_cursor_y / CSIZE ) )
             {
@@ -115,3 +175,19 @@ int quitAll()
 	return 0;
 }
 
+
+void update_button_states( buttons *bts, SDL_Event e, Uint8 isKeydown )
+{
+  switch ( e.key.keysym.scancode )
+    {
+    case SDL_SCANCODE_UP:
+      bts->upButtonDown = isKeydown;
+      break;
+    case SDL_SCANCODE_DOWN:
+      bts->downButtonDown = isKeydown;
+      break;
+    case SDL_SCANCODE_K:
+      bts->kButtonDown = isKeydown;
+      break;
+    }
+}
