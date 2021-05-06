@@ -9,6 +9,7 @@
 #define CSIZE 10  
 #define maxm 1080
 #define maxn 1080
+#define maxtime 1000000
 int grid[maxm][maxn];
 int getNumberOfLiveNeighbors(int x, int y);
 int updateGrid();
@@ -16,6 +17,6 @@ int startgame();
 int drawGrid(int windowHeight,int windowWidth,int M,int N);
 int initSDLWindow(int windowHeight,int windowWidth);
 int quitAll();
-int checkEvents();
+int checkEvents(int M,int N,int time);
 int save();
 #endif 
