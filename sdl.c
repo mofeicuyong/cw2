@@ -13,11 +13,11 @@ typedef struct {
     Uint8 upButtonDown;
     Uint8 downButtonDown;
 } buttons;
-uint8_t quit = FALSE;
+
 uint8_t paused = FALSE;
 buttons keys = { FALSE };
 int living_cells = 0;
-    
+int times;
 Uint32 last_update_time = 0;
 Uint32 ticks_per_lifecycle = 1000;
 void update_button_states( buttons *bts, SDL_Event e, Uint8 isKeydown );
@@ -70,8 +70,14 @@ int drawGrid(int windowHeight,int windowWidth,int M,int N)
 	return 0;
 }
 
-int checkEvents(int M,int N)
+int checkEvents(int M,int N,int time)
 {
+	if ( !( ( SDL_GetTicks( ) - last_update_time ) < ticks_per_lifecycle ) && !paused&&times<time )
+        {
+        	times++;
+            living_cells = updateGrid();
+            last_update_time = SDL_GetTicks( );
+        }
 	while (SDL_PollEvent(&event)) 
 	{
 		if (event.type == SDL_QUIT) 
@@ -88,7 +94,7 @@ int checkEvents(int M,int N)
                     paused = isKeydown ^ paused;
                     break;
                 case SDL_SCANCODE_Q:
-                    quit = TRUE;
+                    done = SDL_TRUE;
                     break;
                 }
 
@@ -118,15 +124,7 @@ int checkEvents(int M,int N)
                 ticks_per_lifecycle += 100;
             }
         }
-		if ( !( ( SDL_GetTicks( ) - last_update_time ) < ticks_per_lifecycle ) && !paused )
-        {
-            living_cells = updateGrid();
-            last_update_time = SDL_GetTicks( );
-        }
-		
-		
-		
-		
+
             else if ( event.type == SDL_MOUSEBUTTONUP )
             {
                 mouse.leftButtonPressed = FALSE;
