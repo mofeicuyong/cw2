@@ -51,7 +51,6 @@ int getNumberOfLiveNeighbors(int x, int y)
     int neighbors = 0 ;       
     if(x<0||y<0)
 	{
-   	printf("somthing went wrong!"); 
    	return -1;
 	}     
     for(int i=x-1 ; i<=x+1 ; i++)
